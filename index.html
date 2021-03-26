@@ -12,15 +12,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
     <script>
+      const qs = (el) => document.getElementById(el);
       function calcEv() {
-        const qs = (el) => document.getElementById(el);
         const howoften = qs('howoften').value;
         const ave = qs('ave').value;
         const amount4b = qs('amount4b').value;
         const potsize = qs('potsize').value;
-        const invest = qs('invest').value;
-        const ev = ((1 - howoften) * (-1 * amount4b)) + (howoften * ((ave * potsize) - invest));
+        const amount3b = qs('amount3b').value;
+        const stack = qs('stack').value;
+        const invest = stack - amount3b;
+        const call4b = amount4b - amount3b;
+        const ev = ((1 - howoften) * (-1 * call4b)) + (howoften * ((ave * potsize) - invest));
         qs('ev').innerHTML = ev;
+      }
+      function calcEquity() {
+        const pot4 =  Number(qs('pot4').value);
+        const stack4 =  Number(qs('stack4').value);
+        const eq = stack4 / (pot4 + (stack4 * 2))
+        qs('equity').innerHTML = eq;
+        
       }
     </script>
   </head>
@@ -31,10 +41,11 @@
     <table>
       <tr ><td>How Often we can stack off on flop :</td><td><input type="text" id="howoften" value="0.56" /></td></tr>
       <tr ><td>Ave Equity when stack off : </td><td><input type="text" id="ave" value="0.612" /></td></tr>
-      <tr ><td>Cost to call 4bet : </td><td><input type="text" id="amount4b" value="25.5" /></td></tr>
-      <tr ><td>Final Pot Size : </td><td><input type="text" id="potsize" value="201.5" /></td></tr>
-      <tr ><td>Our investment excluding 3bet : </td><td><input type="text" id="invest" value="88" /></td></tr>
-      <tr ><td><button onclick="calcEv()">Submit</button></td></tr>
+      <tr ><td>Our 3b Size : </td><td><input type="text" id="amount3b" value="12" /></td></tr>
+      <tr ><td>4b Size : </td><td><input type="text" id="amount4b" value="37.5" /></td></tr>
+      <tr ><td>Our Stack Size : </td><td><input type="text" id="stack" value="100" /></td></tr>
+      <tr ><td>Final Pot Size when All in : </td><td><input type="text" id="potsize" value="201.5" /></td><td style="font-size:smaller;">Remember to remove rake from value</td></tr>
+      <tr ><td><button onclick="calcEv()">Caclulate EV</button></td></tr>
 
     </table>
     <span style="color:blue;font-size:larger;font-weight: bold;" id="ev"></span><br /><hr />
@@ -59,6 +70,12 @@
    <br />
    <br />
    (Just substitute '0.31' with the min equity required)
+   <table>
+    <tr ><td>Pot Size after calling 4b :</td><td><input type="text" id="pot4" value="76.5" /></td></tr>
+    <tr ><td>Effective stack size after calling 4b :</td><td><input type="text" id="stack4" value="62.5" /></td></tr>
+    <tr ><td><button onclick="calcEquity()">Caclulate Min Equity</button></td><td style="color:blue;font-size:larger;font-weight: bold;" id="equity"></td></tr>
+
+  </table>
     
   </body>
 </html>
