@@ -30,8 +30,30 @@
         const stack4 =  Number(qs('stack4').value);
         const eq = stack4 / (pot4 + (stack4 * 2))
         qs('equity').innerHTML = eq;
+        return eq;
         
       }
+      function updatePQL() {
+        const txthowoften = qs('txthowoften');
+        const txtaveeq = qs('txtaveeq');
+        const hand = qs('txthand').value;
+        const eq = calcEquity();
+
+        txthowoften.innerHTML = `select count(minHVREquity(PLAYER_1,flop,${eq}))  as HOW_OFTEN 
+            from game='omahahi', syntax='Generic',
+            PLAYER_1='${hand}',
+            PLAYER_2='AA'`;
+        txtaveeq.innerHTML = `select avg(equity(PLAYER_1,flop))  as AVE_EQUITY 
+        from game='omahahi', syntax='Generic',
+            PLAYER_1='${hand}',
+            PLAYER_2='AA'
+        where minHVREquity(PLAYER_1,flop,${eq})`;
+
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        updatePQL();
+        calcEv();
+      })
     </script>
   </head>
   <body>
@@ -39,43 +61,34 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <table>
-      <tr ><td>How Often we can stack off on flop :</td><td><input type="text" id="howoften" value="0.56" /></td></tr>
-      <tr ><td>Ave Equity when stack off : </td><td><input type="text" id="ave" value="0.612" /></td></tr>
-      <tr ><td>Our 3b Size : </td><td><input type="text" id="amount3b" value="12" /></td></tr>
-      <tr ><td>4b Size : </td><td><input type="text" id="amount4b" value="37.5" /></td></tr>
-      <tr ><td>Our Stack Size : </td><td><input type="text" id="stack" value="100" /></td></tr>
-      <tr ><td>Final Pot Size when All in : </td><td><input type="text" id="potsize" value="201.5" /></td><td style="font-size:smaller;">Remember to remove rake from value</td></tr>
-      <tr ><td><button onclick="calcEv()">Caclulate EV</button></td></tr>
+      <tr ><td>How Often we can stack off on flop :</td><td><input type="text" id="howoften" value="0.56" oninput="calcEv()" /></td></tr>
+      <tr ><td>Ave Equity when stack off : </td><td><input type="text" id="ave" value="0.612" oninput="calcEv()" /></td></tr>
+      <tr ><td>Our 3b Size : </td><td><input type="text" id="amount3b" value="12" oninput="calcEv()" /></td></tr>
+      <tr ><td>4b Size : </td><td><input type="text" id="amount4b" value="37.5" oninput="calcEv()" /></td></tr>
+      <tr ><td>Our Stack Size : </td><td><input type="text" id="stack" value="100" oninput="calcEv()" /></td></tr>
+      <tr ><td>Final Pot Size when All in : </td><td><input type="text" id="potsize" value="201.5" oninput="calcEv()" /></td><td style="font-size:smaller;">Remember to remove rake from value</td></tr>
+      <tr ><td><b>EV: </b></td><td id ="ev" style="color:blue;font-size:larger;font-weight: bold;" id="ev"></td></tr>
 
     </table>
     <span style="color:blue;font-size:larger;font-weight: bold;" id="ev"></span><br /><hr />
-   
-   To find How often we can stack off : <br />
-   <a href="http://propokertools.com/pql" target="_blank">ProPokerTools pql</a>
-   <pre>
-      select count(minHVREquity(PLAYER_1,flop,0.31))  as HOW_OFTEN 
-      from game='omahahi', syntax='Generic',
-      PLAYER_1='2h3s4c5d',
-      PLAYER_2='AA'
+    <table>
+      <tr ><td>Our Hand :</td><td><input type="text" id="txthand" value="2h3s4c5d" oninput="updatePQL()" /></td></tr>
+      <tr ><td>Pot Size after calling 4b :</td><td><input type="text" id="pot4" value="76.5" oninput="updatePQL()"  /></td></tr>
+      <tr ><td>Effective stack size after calling 4b :</td><td><input type="text" id="stack4" value="62.5" oninput="updatePQL()"  /></td></tr>
+      <tr ><td><b>Min Equity</b></td><td style="color:blue;font-size:larger;font-weight: bold;" id="equity"></td></tr>
+  
+    </table>
+    <br />
+    <a href="http://propokertools.com/pql" target="_blank">ProPokerTools pql</a><br /><br />
+   <b>To find How often we can stack off : </b><br />
+   <pre id="txthowoften">
    </pre>
    <br />
-   To find Ave Equity :
-   <pre>
-   select avg(equity(PLAYER_1,flop))  as AVE_EQUITY 
-      from game='omahahi', syntax='Generic',
-           PLAYER_1='2h3s4c5d',
-           PLAYER_2='AA'
-      where minHVREquity(PLAYER_1,flop,0.31)
+   <b>To find Ave Equity :</b>
+   <pre id="txtaveeq"> 
    </pre>
-   <br />
-   <br />
-   (Just substitute '0.31' with the min equity required)
-   <table>
-    <tr ><td>Pot Size after calling 4b :</td><td><input type="text" id="pot4" value="76.5" /></td></tr>
-    <tr ><td>Effective stack size after calling 4b :</td><td><input type="text" id="stack4" value="62.5" /></td></tr>
-    <tr ><td><button onclick="calcEquity()">Caclulate Min Equity</button></td><td style="color:blue;font-size:larger;font-weight: bold;" id="equity"></td></tr>
 
-  </table>
+   
     
   </body>
 </html>
